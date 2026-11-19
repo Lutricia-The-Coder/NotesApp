@@ -26,6 +26,8 @@ type HomeScreenProps = NativeStackScreenProps<
   'Home'
 >;
 
+type SortOrder = 'newest' | 'oldest';
+
 export default function HomeScreen({
   navigation,
 }: HomeScreenProps) {
@@ -33,6 +35,7 @@ export default function HomeScreen({
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchText, setSearchText] = useState('');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 
   // Load the user's notes
   const loadNotes = async () => {
@@ -67,6 +70,18 @@ export default function HomeScreen({
     );
   });
 
+  // Sort notes by date added
+  const sortedNotes = [...filteredNotes].sort((a, b) => {
+    const dateA = new Date(a.dateAdded).getTime();
+    const dateB = new Date(b.dateAdded).getTime();
+
+    if (sortOrder === 'newest') {
+      return dateB - dateA;
+    }
+
+    return dateA - dateB;
+  });
+
   // Display each note
   const renderNote = ({ item }: { item: Note }) => {
     return (
@@ -88,6 +103,10 @@ export default function HomeScreen({
 
         <Text style={styles.noteCategory}>
           {item.category}
+        </Text>
+
+        <Text style={styles.noteDate}>
+          Added: {new Date(item.dateAdded).toLocaleDateString()}
         </Text>
       </TouchableOpacity>
     );
@@ -162,9 +181,48 @@ export default function HomeScreen({
         autoCapitalize="none"
       />
 
+      {/* Sorting Options */}
+      <View style={styles.sortContainer}>
+        <Text style={styles.sortLabel}>Sort by date:</Text>
+
+        <TouchableOpacity
+          style={[
+            styles.sortButton,
+            sortOrder === 'newest' && styles.activeSortButton,
+          ]}
+          onPress={() => setSortOrder('newest')}
+        >
+          <Text
+            style={[
+              styles.sortButtonText,
+              sortOrder === 'newest' && styles.activeSortButtonText,
+            ]}
+          >
+            Newest First
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.sortButton,
+            sortOrder === 'oldest' && styles.activeSortButton,
+          ]}
+          onPress={() => setSortOrder('oldest')}
+        >
+          <Text
+            style={[
+              styles.sortButtonText,
+              sortOrder === 'oldest' && styles.activeSortButtonText,
+            ]}
+          >
+            Oldest First
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Notes List */}
       <FlatList
-        data={filteredNotes}
+        data={sortedNotes}
         keyExtractor={(item) => item.id}
         renderItem={renderNote}
         ListEmptyComponent={
@@ -267,7 +325,41 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 15,
+    marginBottom: 12,
+  },
+
+  sortContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     marginBottom: 15,
+    gap: 8,
+  },
+
+  sortLabel: {
+    fontSize: 13,
+    color: '#777777',
+  },
+
+  sortButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: '#EEEEEE',
+  },
+
+  activeSortButton: {
+    backgroundColor: '#333333',
+  },
+
+  sortButtonText: {
+    fontSize: 12,
+    color: '#333333',
+    fontWeight: 'bold',
+  },
+
+  activeSortButtonText: {
+    color: '#FFFFFF',
   },
 
   noteCard: {
@@ -292,6 +384,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#777777',
     marginTop: 10,
+  },
+
+  noteDate: {
+    fontSize: 12,
+    color: '#888888',
+    marginTop: 5,
   },
 
   emptyText: {
