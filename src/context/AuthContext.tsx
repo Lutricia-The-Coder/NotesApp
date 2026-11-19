@@ -19,7 +19,6 @@ import {
   clearSession,
 } from '../storage/storage';
 
-// Authentication functions available throughout the app
 interface AuthContextType {
   user: LoggedInUser | null;
   loading: boolean;
@@ -30,6 +29,12 @@ interface AuthContextType {
   ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (
+    username: string,
+    email: string,
+    currentPassword: string,
+    newPassword?: string
+  ) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -69,10 +74,8 @@ export default function AuthProvider({
     password: string
   ) => {
     const users = await getUsers();
-
     const cleanEmail = email.trim().toLowerCase();
 
-    // Check whether the email already exists
     const existingUser = users.find(
       (item) => item.email === cleanEmail
     );
@@ -81,7 +84,6 @@ export default function AuthProvider({
       throw new Error('An account with this email already exists.');
     }
 
-    // Hash the password before saving it
     const passwordHash = await hash(password, 10);
 
     const newUser: User = {
@@ -91,12 +93,10 @@ export default function AuthProvider({
       passwordHash,
     };
 
-    // Save the new user
     const updatedUsers = [...users, newUser];
 
     await saveUsers(updatedUsers);
 
-    // Create the logged-in user information
     const loggedInUser: LoggedInUser = {
       id: newUser.id,
       username: newUser.username,
@@ -104,14 +104,12 @@ export default function AuthProvider({
     };
 
     await saveSession(loggedInUser);
-
     setUser(loggedInUser);
   };
 
   // Login an existing user
   const login = async (email: string, password: string) => {
     const users = await getUsers();
-
     const cleanEmail = email.trim().toLowerCase();
 
     const existingUser = users.find(
@@ -122,7 +120,6 @@ export default function AuthProvider({
       throw new Error('Invalid email or password.');
     }
 
-    // Compare the entered password with the saved hash
     const passwordMatches = await compare(
       password,
       existingUser.passwordHash
@@ -139,8 +136,81 @@ export default function AuthProvider({
     };
 
     await saveSession(loggedInUser);
-
     setUser(loggedInUser);
+  };
+
+  // Update the current user's profile
+  const updateProfile = async (
+    username: string,
+    email: string,
+    currentPassword: string,
+    newPassword?: string
+  ) => {
+    if (!user) {
+      throw new Error('You must be logged in to update your profile.');
+    }
+
+    const users = await getUsers();
+
+    const currentUser = users.find(
+      (item) => item.id === user.id
+    );
+
+    if (!currentUser) {
+      throw new Error('User account could not be found.');
+    }
+
+    // Verify the current password before making changes
+    const passwordMatches = await compare(
+      currentPassword,
+      currentUser.passwordHash
+    );
+
+    if (!passwordMatches) {
+      throw new Error('Your current password is incorrect.');
+    }
+
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Check whether another account already uses this email
+    const existingEmail = users.find(
+      (item) =>
+        item.email === cleanEmail &&
+        item.id !== user.id
+    );
+
+    if (existingEmail) {
+      throw new Error('This email address is already in use.');
+    }
+
+    // Hash the new password if one was provided
+    const updatedPasswordHash =
+      newPassword && newPassword.trim().length > 0
+        ? await hash(newPassword, 10)
+        : currentUser.passwordHash;
+
+    const updatedUser: User = {
+      ...currentUser,
+      username: cleanUsername,
+      email: cleanEmail,
+      passwordHash: updatedPasswordHash,
+    };
+
+    const updatedUsers = users.map((item) =>
+      item.id === user.id ? updatedUser : item
+    );
+
+    await saveUsers(updatedUsers);
+
+    const updatedSession: LoggedInUser = {
+      id: updatedUser.id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+    };
+
+    await saveSession(updatedSession);
+    setUser(updatedSession);
   };
 
   // Logout the current user
@@ -157,6 +227,7 @@ export default function AuthProvider({
         register,
         login,
         logout,
+        updateProfile,
       }}
     >
       {children}
