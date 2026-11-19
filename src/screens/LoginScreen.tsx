@@ -1,26 +1,30 @@
 import React, { useState } from 'react';
 
 import {
-  View,
+  Alert,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
+  View,
 } from 'react-native';
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAppTheme } from '../context/ThemeContext';
+
+import { BrandMark, LockMark } from '../components/NotesUi';
 import { useAuth } from '../context/AuthContext';
-type LoginScreenProps = NativeStackScreenProps<
-  RootStackParamList,
-  'Login'
->;
+import { RootStackParamList } from '../navigation/types';
+
+type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+
 export default function LoginScreen({
   navigation,
 }: LoginScreenProps) {
   const { login } = useAuth();
-
+  const { colors } = useAppTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -32,106 +36,164 @@ export default function LoginScreen({
 
     try {
       await login(email, password);
-
       Alert.alert('Success', 'You have logged in successfully!');
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : 'Something went wrong.';
-
+        error instanceof Error ? error.message : 'Something went wrong.';
       Alert.alert('Login Failed', message);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Welcome Back</Text>
-
-      <Text style={styles.label}>Email Address</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleLogin}
+    <SafeAreaView
+      style={[styles.screen, { backgroundColor: colors.background }]}
+    >
+      <StatusBar barStyle="dark-content" />
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+        <View style={styles.brandRow}>
+          <BrandMark />
+          <View style={[styles.lockTile, { backgroundColor: colors.soft }]}>
+            <LockMark color={colors.primary} />
+          </View>
+        </View>
 
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Register')}
-      >
-        <Text style={styles.link}>
-          Don't have an account? Register
+        <Text style={[styles.heading, { color: colors.text }]}>
+          Your thoughts,{'\n'}safe &amp; sound.
         </Text>
-      </TouchableOpacity>
-    </View>
+        <Text style={[styles.description, { color: colors.muted }]}>
+          Welcome back. Make a little room for you.
+        </Text>
+
+        <Text style={[styles.label, { color: colors.label }]}>
+          Email address
+        </Text>
+        <TextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              color: colors.text,
+            },
+          ]}
+          placeholder="Enter your email"
+          placeholderTextColor={colors.muted}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          accessibilityLabel="Email address"
+        />
+
+        <Text style={[styles.label, { color: colors.label }]}>Password</Text>
+        <TextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              color: colors.text,
+            },
+          ]}
+          placeholder="Enter your password"
+          placeholderTextColor={colors.muted}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          accessibilityLabel="Password"
+        />
+
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.primary }]}
+          onPress={handleLogin}
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonText}>Log in</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.linkButton}
+          onPress={() => navigation.navigate('Register')}
+          accessibilityRole="button"
+        >
+          <Text style={[styles.link, { color: colors.softText }]}>
+            Don&apos;t have an account? Register
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 25,
-    backgroundColor: '#FFFFFF',
   },
-
-  heading: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
+  content: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 32,
   },
-
-  label: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 8,
+  brandRow: {
+    minHeight: 92,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 24,
   },
-
-  input: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 18,
-    fontSize: 16,
-  },
-
-  button: {
-    backgroundColor: '#333333',
-    padding: 15,
-    borderRadius: 8,
+  lockTile: {
+    width: 82,
+    height: 82,
+    borderRadius: 22,
     alignItems: 'center',
-    marginTop: 10,
+    justifyContent: 'center',
   },
-
+  heading: {
+    fontFamily: 'serif',
+    fontSize: 34,
+    lineHeight: 44,
+    marginBottom: 12,
+  },
+  description: {
+    fontSize: 14,
+    lineHeight: 21,
+    marginBottom: 34,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 9,
+  },
+  input: {
+    minHeight: 54,
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 15,
+    fontSize: 15,
+    marginBottom: 24,
+  },
+  button: {
+    minHeight: 54,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '700',
   },
-
+  linkButton: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
   link: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#333333',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

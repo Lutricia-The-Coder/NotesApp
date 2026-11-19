@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { useAppTheme } from '../context/ThemeContext';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
@@ -22,6 +23,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
  const { user, loading } = useAuth();
+ const { colors } = useAppTheme();
 if (loading) {
   return (
     <View
@@ -29,24 +31,17 @@ if (loading) {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: colors.background,
       }}
     >
-      <ActivityIndicator size="large" color="#333333" />
+      <ActivityIndicator size="large" color={colors.primary} />
     </View>
   );
 }
   return (
     <NavigationContainer>
       <Stack.Navigator
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#FFFFFF',
-          },
-          headerTintColor: '#333333',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
+        screenOptions={{ headerShown: false }}
       >
         {user ? (
           <>
@@ -89,7 +84,7 @@ if (loading) {
             <Stack.Screen
               name="Profile"
               component={ProfileScreen}
-              options={{ title: 'My Profile' }}
+              options={{ headerShown: false }}
             />
             <Stack.Screen
   name="NoteDetails"

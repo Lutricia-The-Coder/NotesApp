@@ -1,35 +1,26 @@
-
 import React, { useEffect, useState } from 'react';
 
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
   ActivityIndicator,
+  Alert,
+  StatusBar,
+  StyleSheet,
+  Text,
 } from 'react-native';
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { RootStackParamList } from '../navigation/types';
-
+import { BackHeader } from '../components/NotesUi';
+import NoteEditor from '../components/NoteEditor';
 import { useAuth } from '../context/AuthContext';
-
-import {
-  Note,
-  getNotes,
-  updateNote,
-} from '../storage/storage';
+import { useAppTheme } from '../context/ThemeContext';
+import { RootStackParamList } from '../navigation/types';
+import { Note, getNotes, updateNote } from '../storage/storage';
 
 type EditNoteScreenProps = NativeStackScreenProps<
   RootStackParamList,
   'EditNote'
 >;
-
-type NoteCategory = 'Work' | 'Study' | 'Personal';
 
 export default function EditNoteScreen({
   route,
@@ -37,41 +28,48 @@ export default function EditNoteScreen({
 }: EditNoteScreenProps) {
   const { noteId } = route.params;
   const { user } = useAuth();
-
+  const { colors } = useAppTheme();
   const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState<NoteCategory>('Work');
+  const [category, setCategory] = useState<Note['category']>('Work');
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    let isCurrent = true;
+
     const loadNote = async () => {
       try {
         const notes = await getNotes();
-
         const foundNote = notes.find(
-          (item) =>
-            item.id === noteId &&
-            item.userId === user?.id
+          (item) => item.id === noteId && item.userId === user?.id
         );
 
-        if (foundNote) {
+        if (isCurrent && foundNote) {
           setNote(foundNote);
           setTitle(foundNote.title);
           setContent(foundNote.content);
           setCategory(foundNote.category);
-        } else {
+        } else if (isCurrent) {
           Alert.alert('Error', 'Note not found.');
         }
-      } catch (error) {
-        Alert.alert('Error', 'Unable to load note.');
+      } catch {
+        if (isCurrent) {
+          Alert.alert('Error', 'Unable to load note.');
+        }
       } finally {
-        setLoading(false);
+        if (isCurrent) {
+          setLoading(false);
+        }
       }
     };
 
-    loadNote();
-  }, [noteId, user]);
+    void loadNote();
+    return () => {
+      isCurrent = false;
+    };
+  }, [noteId, user?.id]);
 
   const handleUpdateNote = async () => {
     if (!content.trim()) {
@@ -85,6 +83,7 @@ export default function EditNoteScreen({
     }
 
     try {
+      setSaving(true);
       const updatedNote: Note = {
         ...note,
         title: title.trim(),
@@ -94,178 +93,74 @@ export default function EditNoteScreen({
       };
 
       await updateNote(updatedNote);
-
       Alert.alert('Success', 'Your note has been updated!');
-
       navigation.goBack();
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Unable to update your note.');
+    } finally {
+      setSaving(false);
     }
   };
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#333333" />
-      </View>
+      <SafeAreaView
+        style={[styles.center, { backgroundColor: colors.background }]}
+      >
+        <StatusBar barStyle="dark-content" />
+        <ActivityIndicator size="large" color={colors.primary} />
+      </SafeAreaView>
     );
   }
 
   if (!note) {
     return (
-      <View style={styles.center}>
-        <Text>Note not found.</Text>
-      </View>
+      <SafeAreaView
+        style={[styles.errorScreen, { backgroundColor: colors.background }]}
+      >
+        <StatusBar barStyle="dark-content" />
+        <BackHeader
+          title="Edit note"
+          onBack={() => navigation.goBack()}
+        />
+        <Text style={[styles.errorText, { color: colors.muted }]}>
+          Note not found.
+        </Text>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.heading}>Edit Note</Text>
-
-        <Text style={styles.label}>Title (Optional)</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Enter note title"
-          value={title}
-          onChangeText={setTitle}
-        />
-
-        <Text style={styles.label}>Note</Text>
-
-        <TextInput
-          style={styles.contentInput}
-          placeholder="Write your note here..."
-          value={content}
-          onChangeText={setContent}
-          multiline
-          textAlignVertical="top"
-        />
-
-        <Text style={styles.label}>Select Category</Text>
-
-        <View style={styles.categoryContainer}>
-          {(['Work', 'Study', 'Personal'] as NoteCategory[]).map(
-            (item) => (
-              <TouchableOpacity
-                key={item}
-                style={[
-                  styles.categoryButton,
-                  category === item && styles.selectedCategory,
-                ]}
-                onPress={() => setCategory(item)}
-              >
-                <Text
-                  style={[
-                    styles.categoryText,
-                    category === item && styles.selectedCategoryText,
-                  ]}
-                >
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            )
-          )}
-        </View>
-
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={handleUpdateNote}
-        >
-          <Text style={styles.saveButtonText}>Update Note</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+    <NoteEditor
+      heading="Edit note"
+      title={title}
+      content={content}
+      category={category}
+      saveLabel="Save changes"
+      saving={saving}
+      onTitleChange={setTitle}
+      onContentChange={setContent}
+      onCategoryChange={setCategory}
+      onBack={() => navigation.goBack()}
+      onSave={() => void handleUpdateNote()}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-
   center: {
     flex: 1,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
   },
-
-  form: {
-    padding: 20,
+  errorScreen: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 10,
   },
-
-  heading: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    marginBottom: 25,
-  },
-
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-
-  input: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 20,
-  },
-
-  contentInput: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 8,
-    padding: 12,
-    height: 180,
-    fontSize: 16,
-    marginBottom: 20,
-  },
-
-  categoryContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 30,
-  },
-
-  categoryButton: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-  },
-
-  selectedCategory: {
-    backgroundColor: '#333333',
-    borderColor: '#333333',
-  },
-
-  categoryText: {
-    color: '#333333',
-    fontWeight: 'bold',
-  },
-
-  selectedCategoryText: {
-    color: '#FFFFFF',
-  },
-
-  saveButton: {
-    backgroundColor: '#333333',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-
-  saveButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+  errorText: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 32,
   },
 });
