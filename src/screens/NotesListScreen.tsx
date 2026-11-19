@@ -160,9 +160,7 @@ export default function NotesListScreen({
             title="Sort notes"
             onBack={() => setScreenMode('list')}
           />
-          <Text style={[styles.modeDescription, { color: colors.muted }]}>
-            A little space to make it yours.
-          </Text>
+          
           <Text style={[styles.sortHeadline, { color: colors.text }]}>
             A little order, your way.
           </Text>

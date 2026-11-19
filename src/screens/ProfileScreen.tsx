@@ -229,15 +229,6 @@ export default function ProfileScreen({
               onBack={() => navigation.goBack()}
             />
 
-            <Text style={[styles.greetingCaption, { color: colors.muted }]}>
-              Made for you, {firstName}.
-            </Text>
-            <Text style={[styles.greeting, { color: colors.text }]}>
-              Hello, {firstName}.
-            </Text>
-            <Text style={[styles.greetingDescription, { color: colors.muted }]}>
-              A space that&apos;s entirely yours.
-            </Text>
 
             <View
               style={[

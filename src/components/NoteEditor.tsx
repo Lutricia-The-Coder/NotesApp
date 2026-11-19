@@ -63,9 +63,7 @@ export default function NoteEditor({
         showsVerticalScrollIndicator={false}
       >
         <BackHeader title={heading} onBack={onBack} />
-        <Text style={[styles.description, { color: colors.muted }]}>
-          A little space to make it yours.
-        </Text>
+        
 
         <Text style={[styles.fieldLabel, { color: colors.label }]}>
           TITLE - OPTIONAL
