@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -22,6 +23,7 @@ type NoteDetailsScreenProps = NativeStackScreenProps<
 
 export default function NoteDetailsScreen({
   route,
+  navigation,
 }: NoteDetailsScreenProps) {
   const { noteId } = route.params;
   const { user } = useAuth();
@@ -84,6 +86,7 @@ export default function NoteDetailsScreen({
       </Text>
 
       <Text style={styles.dateLabel}>Date Added</Text>
+
       <Text style={styles.date}>
         {formatDate(note.dateAdded)}
       </Text>
@@ -91,6 +94,7 @@ export default function NoteDetailsScreen({
       {note.dateEdited && (
         <>
           <Text style={styles.dateLabel}>Last Edited</Text>
+
           <Text style={styles.date}>
             {formatDate(note.dateEdited)}
           </Text>
@@ -100,6 +104,17 @@ export default function NoteDetailsScreen({
       <View style={styles.divider} />
 
       <Text style={styles.content}>{note.content}</Text>
+
+      <TouchableOpacity
+        style={styles.editButton}
+        onPress={() =>
+          navigation.navigate('EditNote', {
+            noteId: note.id,
+          })
+        }
+      >
+        <Text style={styles.editButtonText}>Edit Note</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -110,41 +125,62 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 20,
   },
+
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   category: {
     fontSize: 14,
     color: '#777777',
     fontWeight: 'bold',
     marginBottom: 10,
   },
+
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     color: '#222222',
     marginBottom: 25,
   },
+
   dateLabel: {
     fontSize: 13,
     color: '#777777',
     marginTop: 10,
   },
+
   date: {
     fontSize: 14,
     color: '#333333',
     marginTop: 5,
   },
+
   divider: {
     height: 1,
     backgroundColor: '#DDDDDD',
     marginVertical: 20,
   },
+
   content: {
     fontSize: 16,
     lineHeight: 25,
     color: '#333333',
+  },
+
+  editButton: {
+    backgroundColor: '#333333',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 30,
+  },
+
+  editButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

@@ -92,3 +92,18 @@ export const addNote = async (note: Note): Promise<void> => {
 
   await saveNotes(updatedNotes);
 };
+
+export const updateNote = async (
+  updatedNote: Note
+): Promise<void> => {
+  const notes = await getNotes();
+
+  const updatedNotes = notes.map((note) =>
+    note.id === updatedNote.id &&
+    note.userId === updatedNote.userId
+      ? updatedNote
+      : note
+  );
+
+  await saveNotes(updatedNotes);
+};
