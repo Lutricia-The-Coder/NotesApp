@@ -16,6 +16,16 @@ export interface LoggedInUser {
   email: string;
 }
 
+export interface Note {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  category: 'Work' | 'Study' | 'Personal';
+  dateAdded: string;
+  dateEdited?: string;
+}
+
 // Storage keys
 const USERS_KEY = '@notes_app_users';
 const SESSION_KEY = '@notes_app_session';
@@ -49,4 +59,27 @@ export const getSession = async (): Promise<LoggedInUser | null> => {
 // Remove the logged-in user's session
 export const clearSession = async (): Promise<void> => {
   await AsyncStorage.removeItem(SESSION_KEY);
+};
+
+const NOTES_KEY = '@notes_app_notes';
+
+// Get all saved notes
+export const getNotes = async (): Promise<Note[]> => {
+  const notes = await AsyncStorage.getItem(NOTES_KEY);
+
+  return notes ? JSON.parse(notes) : [];
+};
+
+// Save all notes
+export const saveNotes = async (notes: Note[]): Promise<void> => {
+  await AsyncStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+};
+
+// Get notes belonging to a specific user
+export const getUserNotes = async (
+  userId: string
+): Promise<Note[]> => {
+  const notes = await getNotes();
+
+  return notes.filter((note) => note.userId === userId);
 };
