@@ -1,6 +1,6 @@
 
 import React from 'react';
-
+import 'react-native-get-random-values';
 import AuthProvider from './src/context/AuthContext';
 import AppNavigator from './src/navigation/AppNavigator';
 
