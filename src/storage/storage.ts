@@ -107,3 +107,17 @@ export const updateNote = async (
 
   await saveNotes(updatedNotes);
 };
+// delete note 
+export const deleteNote = async (
+  noteId: string,
+  userId: string
+): Promise<void> => {
+  const notes = await getNotes();
+
+  const updatedNotes = notes.filter(
+    (note) =>
+      !(note.id === noteId && note.userId === userId)
+  );
+
+  await saveNotes(updatedNotes);
+};

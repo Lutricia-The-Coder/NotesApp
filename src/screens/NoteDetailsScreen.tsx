@@ -13,7 +13,12 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { RootStackParamList } from '../navigation/types';
-import { Note, getNotes } from '../storage/storage';
+import {
+  Note,
+  getNotes,
+  deleteNote,
+} from '../storage/storage';
+
 import { useAuth } from '../context/AuthContext';
 
 type NoteDetailsScreenProps = NativeStackScreenProps<
@@ -59,6 +64,38 @@ export default function NoteDetailsScreen({
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleString();
+  };
+
+  const handleDeleteNote = () => {
+    if (!note || !user) {
+      return;
+    }
+
+    Alert.alert(
+      'Delete Note',
+      'Are you sure you want to delete this note? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteNote(note.id, user.id);
+
+              Alert.alert('Success', 'Your note has been deleted.');
+
+              navigation.goBack();
+            } catch (error) {
+              Alert.alert('Error', 'Unable to delete your note.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (loading) {
@@ -114,6 +151,13 @@ export default function NoteDetailsScreen({
         }
       >
         <Text style={styles.editButtonText}>Edit Note</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={handleDeleteNote}
+      >
+        <Text style={styles.deleteButtonText}>Delete Note</Text>
       </TouchableOpacity>
     </View>
   );
@@ -179,6 +223,20 @@ const styles = StyleSheet.create({
   },
 
   editButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
+  deleteButton: {
+    backgroundColor: '#D32F2F',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+
+  deleteButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
