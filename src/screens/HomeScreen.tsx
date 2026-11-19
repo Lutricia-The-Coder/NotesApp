@@ -118,12 +118,19 @@ export default function HomeScreen({ navigation }: any) {
       <FlatList
         data={notes}
         keyExtractor={(item) => item.id}
-        renderItem={renderNote}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            No notes yet. Start by adding your first note.
-          </Text>
-        }
+        renderItem={({ item }) => (
+  <TouchableOpacity
+    style={styles.noteCard}
+    onPress={() =>
+      navigation.navigate('NoteDetails', {
+        noteId: item.id,
+      })
+    }
+  >
+    <Text>{item.title || 'Untitled Note'}</Text>
+    <Text>{item.content}</Text>
+  </TouchableOpacity>
+)}
       />
 
     </View>

@@ -14,6 +14,7 @@ import PersonalNotesScreen from '../screens/PersonalNotesScreen';
 import AddNoteScreen from '../screens/AddNoteScreen';
 import EditNoteScreen from '../screens/EditNoteScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import NoteDetailsScreen from '../screens/NoteDetailsScreen';
 
 import { RootStackParamList } from './types';
 
@@ -90,6 +91,11 @@ if (loading) {
               component={ProfileScreen}
               options={{ title: 'My Profile' }}
             />
+            <Stack.Screen
+  name="NoteDetails"
+  component={NoteDetailsScreen}
+  options={{ title: 'Note Details' }}
+/>
           </>
         ) : (
           <>

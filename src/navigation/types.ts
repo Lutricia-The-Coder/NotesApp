@@ -1,4 +1,3 @@
-
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
@@ -8,6 +7,9 @@ export type RootStackParamList = {
   Personal: undefined;
   AddNote: undefined;
   EditNote: {
+    noteId: string;
+  };
+  NoteDetails: {
     noteId: string;
   };
   Profile: undefined;
