@@ -115,23 +115,22 @@ export default function HomeScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={notes}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-  <TouchableOpacity
-    style={styles.noteCard}
-    onPress={() =>
-      navigation.navigate('NoteDetails', {
-        noteId: item.id,
-      })
-    }
-  >
-    <Text>{item.title || 'Untitled Note'}</Text>
-    <Text>{item.content}</Text>
-  </TouchableOpacity>
-)}
-      />
+<FlatList
+  data={notes}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => (
+    <TouchableOpacity
+      style={styles.noteCard}
+      onPress={() =>
+        navigation.navigate('NoteDetails', {
+          noteId: item.id,
+        })
+      }
+    >
+      {/* Keep your existing note title and content here */}
+    </TouchableOpacity>
+  )}
+/>
 
     </View>
   );

@@ -9,8 +9,8 @@ export type RootStackParamList = {
   EditNote: {
     noteId: string;
   };
+  Profile: undefined;
   NoteDetails: {
     noteId: string;
   };
-  Profile: undefined;
 };

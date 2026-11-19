@@ -6,6 +6,7 @@ import {
   Text,
   FlatList,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -63,7 +64,14 @@ export default function PersonalNotesScreen({
         data={notes}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.noteCard}>
+          <TouchableOpacity
+            style={styles.noteCard}
+            onPress={() =>
+              navigation.navigate('NoteDetails', {
+                noteId: item.id,
+              })
+            }
+          >
             <Text style={styles.noteTitle}>
               {item.title || 'Untitled Note'}
             </Text>
@@ -75,7 +83,7 @@ export default function PersonalNotesScreen({
             <Text style={styles.date}>
               Added: {new Date(item.dateAdded).toLocaleDateString()}
             </Text>
-          </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={
           <Text style={styles.emptyText}>

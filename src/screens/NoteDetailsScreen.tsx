@@ -6,12 +6,14 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  ScrollView,
+  Alert,
 } from 'react-native';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
 import { RootStackParamList } from '../navigation/types';
-import { getNotes, Note } from '../storage/storage';
+import { Note, getNotes } from '../storage/storage';
+import { useAuth } from '../context/AuthContext';
 
 type NoteDetailsScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -22,6 +24,7 @@ export default function NoteDetailsScreen({
   route,
 }: NoteDetailsScreenProps) {
   const { noteId } = route.params;
+  const { user } = useAuth();
 
   const [note, setNote] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,20 +34,30 @@ export default function NoteDetailsScreen({
       try {
         const notes = await getNotes();
 
-        const selectedNote = notes.find(
-          (item) => item.id === noteId
+        const foundNote = notes.find(
+          (item) =>
+            item.id === noteId &&
+            item.userId === user?.id
         );
 
-        setNote(selectedNote ?? null);
+        if (foundNote) {
+          setNote(foundNote);
+        } else {
+          Alert.alert('Error', 'Note not found.');
+        }
       } catch (error) {
-        console.log('Error loading note:', error);
+        Alert.alert('Error', 'Unable to load this note.');
       } finally {
         setLoading(false);
       }
     };
 
     loadNote();
-  }, [noteId]);
+  }, [noteId, user]);
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleString();
+  };
 
   if (loading) {
     return (
@@ -57,35 +70,37 @@ export default function NoteDetailsScreen({
   if (!note) {
     return (
       <View style={styles.center}>
-        <Text style={styles.message}>Note not found.</Text>
+        <Text>Note not found.</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.category}>{note.category}</Text>
+    <View style={styles.container}>
+      <Text style={styles.category}>{note.category}</Text>
 
-        <Text style={styles.title}>
-          {note.title || 'Untitled Note'}
-        </Text>
+      <Text style={styles.title}>
+        {note.title || 'Untitled Note'}
+      </Text>
 
-        <Text style={styles.content}>{note.content}</Text>
+      <Text style={styles.dateLabel}>Date Added</Text>
+      <Text style={styles.date}>
+        {formatDate(note.dateAdded)}
+      </Text>
 
-        <View style={styles.divider} />
-
-        <Text style={styles.date}>
-          Date added: {new Date(note.dateAdded).toLocaleString()}
-        </Text>
-
-        {note.dateEdited && (
+      {note.dateEdited && (
+        <>
+          <Text style={styles.dateLabel}>Last Edited</Text>
           <Text style={styles.date}>
-            Last edited: {new Date(note.dateEdited).toLocaleString()}
+            {formatDate(note.dateEdited)}
           </Text>
-        )}
-      </View>
-    </ScrollView>
+        </>
+      )}
+
+      <View style={styles.divider} />
+
+      <Text style={styles.content}>{note.content}</Text>
+    </View>
   );
 }
 
@@ -93,47 +108,43 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+    padding: 20,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  card: {
-    margin: 20,
-    padding: 20,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-  },
   category: {
     fontSize: 14,
-    color: '#666666',
+    color: '#777777',
     fontWeight: 'bold',
     marginBottom: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#222222',
-    marginBottom: 20,
+    marginBottom: 25,
   },
-  content: {
-    fontSize: 16,
+  dateLabel: {
+    fontSize: 13,
+    color: '#777777',
+    marginTop: 10,
+  },
+  date: {
+    fontSize: 14,
     color: '#333333',
-    lineHeight: 25,
+    marginTop: 5,
   },
   divider: {
     height: 1,
-    backgroundColor: '#CCCCCC',
+    backgroundColor: '#DDDDDD',
     marginVertical: 20,
   },
-  date: {
-    fontSize: 13,
-    color: '#666666',
-    marginBottom: 8,
-  },
-  message: {
+  content: {
     fontSize: 16,
-    color: '#666666',
+    lineHeight: 25,
+    color: '#333333',
   },
 });
