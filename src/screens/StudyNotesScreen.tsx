@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -31,6 +32,7 @@ export default function StudyNotesScreen({
   const { user } = useAuth();
 
   const [notes, setNotes] = useState<Note[]>([]);
+  const [searchText, setSearchText] = useState('');
 
   const loadNotes = async () => {
     if (user) {
@@ -52,6 +54,20 @@ export default function StudyNotesScreen({
     return unsubscribe;
   }, [navigation, user]);
 
+  const filteredNotes = notes.filter((note) => {
+    const searchWords = searchText
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
+
+    const noteText = `${note.title} ${note.content}`.toLowerCase();
+
+    return searchWords.every((word) =>
+      noteText.includes(word)
+    );
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Study Notes</Text>
@@ -60,8 +76,16 @@ export default function StudyNotesScreen({
         All your study-related notes.
       </Text>
 
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search study notes..."
+        value={searchText}
+        onChangeText={setSearchText}
+        autoCapitalize="none"
+      />
+
       <FlatList
-        data={notes}
+        data={filteredNotes}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -87,7 +111,9 @@ export default function StudyNotesScreen({
         )}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
-            No study notes available.
+            {searchText.trim()
+              ? 'No study notes match your search.'
+              : 'No study notes available.'}
           </Text>
         }
       />
@@ -112,6 +138,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#777777',
     marginBottom: 20,
+  },
+
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 15,
+    marginBottom: 15,
   },
 
   noteCard: {

@@ -7,7 +7,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  TextInput,
 } from 'react-native';
+
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { RootStackParamList } from '../navigation/types';
 
 import { useAuth } from '../context/AuthContext';
 
@@ -16,10 +21,18 @@ import {
   getUserNotes,
 } from '../storage/storage';
 
-export default function HomeScreen({ navigation }: any) {
-  const { user, logout } = useAuth();
+type HomeScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  'Home'
+>;
+
+export default function HomeScreen({
+  navigation,
+}: HomeScreenProps) {
+  const { user } = useAuth();
 
   const [notes, setNotes] = useState<Note[]>([]);
+  const [searchText, setSearchText] = useState('');
 
   // Load the user's notes
   const loadNotes = async () => {
@@ -38,10 +51,33 @@ export default function HomeScreen({ navigation }: any) {
     return unsubscribe;
   }, [navigation, user]);
 
+  // Search notes using every word entered
+  const filteredNotes = notes.filter((note) => {
+    const searchWords = searchText
+      .toLowerCase()
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
+
+    const noteText = `${note.title} ${note.content}`
+      .toLowerCase();
+
+    return searchWords.every((word) =>
+      noteText.includes(word)
+    );
+  });
+
   // Display each note
   const renderNote = ({ item }: { item: Note }) => {
     return (
-      <View style={styles.noteCard}>
+      <TouchableOpacity
+        style={styles.noteCard}
+        onPress={() =>
+          navigation.navigate('NoteDetails', {
+            noteId: item.id,
+          })
+        }
+      >
         <Text style={styles.noteTitle}>
           {item.title || 'Untitled Note'}
         </Text>
@@ -53,7 +89,7 @@ export default function HomeScreen({ navigation }: any) {
         <Text style={styles.noteCategory}>
           {item.category}
         </Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -68,7 +104,9 @@ export default function HomeScreen({ navigation }: any) {
           </Text>
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Profile')}
+        >
           <Text style={styles.profileButton}>Profile</Text>
         </TouchableOpacity>
       </View>
@@ -115,22 +153,28 @@ export default function HomeScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
-<FlatList
-  data={notes}
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => (
-    <TouchableOpacity
-      style={styles.noteCard}
-      onPress={() =>
-        navigation.navigate('NoteDetails', {
-          noteId: item.id,
-        })
-      }
-    >
-      {/* Keep your existing note title and content here */}
-    </TouchableOpacity>
-  )}
-/>
+      {/* Search Bar */}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search notes..."
+        value={searchText}
+        onChangeText={setSearchText}
+        autoCapitalize="none"
+      />
+
+      {/* Notes List */}
+      <FlatList
+        data={filteredNotes}
+        keyExtractor={(item) => item.id}
+        renderItem={renderNote}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>
+            {searchText.trim()
+              ? 'No notes match your search.'
+              : 'No notes available. Add your first note!'}
+          </Text>
+        }
+      />
 
     </View>
   );
@@ -215,6 +259,15 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
+  },
+
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 15,
+    marginBottom: 15,
   },
 
   noteCard: {
