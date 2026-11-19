@@ -83,3 +83,12 @@ export const getUserNotes = async (
 
   return notes.filter((note) => note.userId === userId);
 };
+
+// Add a new note
+export const addNote = async (note: Note): Promise<void> => {
+  const notes = await getNotes();
+
+  const updatedNotes = [...notes, note];
+
+  await saveNotes(updatedNotes);
+};
