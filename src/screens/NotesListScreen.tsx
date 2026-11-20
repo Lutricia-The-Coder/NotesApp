@@ -1,20 +1,7 @@
 import React, { useCallback, useState } from 'react';
-
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Platform,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ActivityIndicator,Alert,Image,FlatList,Modal,Platform,Pressable,StatusBar,StyleSheet,Text,TextInput,TouchableOpacity,View,} from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { BottomNavigation, BrandMark, BackHeader } from '../components/NotesUi';
 import { useAuth } from '../context/AuthContext';
 import { useAppTheme } from '../context/ThemeContext';
@@ -22,7 +9,7 @@ import { Note, getUserNotes } from '../storage/storage';
 
 export type NoteCategory = 'All' | 'Work' | 'Study' | 'Personal';
 type SortOrder = 'newest' | 'oldest';
-type ScreenMode = 'list' | 'search' | 'sort';
+type ScreenMode = 'list' | 'search';
 
 interface NotesListScreenProps {
   category: NoteCategory;
@@ -39,14 +26,14 @@ export default function NotesListScreen({
   onOpenAddNote,
   onOpenProfile,
 }: NotesListScreenProps) {
-  const { colors } = useAppTheme();
+  const { colors , lightTheme} = useAppTheme();
   const { user } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
   const [searchText, setSearchText] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [screenMode, setScreenMode] = useState<ScreenMode>('list');
   const [loading, setLoading] = useState(true);
-
+  const [sortMenuVisible, setSortMenuVisible] = useState(false);
   useFocusEffect(
     useCallback(() => {
       let isCurrent = true;
@@ -148,75 +135,6 @@ export default function NotesListScreen({
   const emptyText = searchText.trim()
     ? 'No notes match your search.'
     : 'No notes yet. Make a little room for a new thought.';
-
-  if (screenMode === 'sort') {
-    return (
-      <SafeAreaView
-        style={[styles.screen, { backgroundColor: colors.background }]}
-      >
-        <StatusBar barStyle="dark-content" />
-        <View style={styles.modeContent}>
-          <BackHeader
-            title="Sort notes"
-            onBack={() => setScreenMode('list')}
-          />
-          
-          <Text style={[styles.sortHeadline, { color: colors.text }]}>
-            A little order, your way.
-          </Text>
-          <Text style={[styles.sortDescription, { color: colors.muted }]}>
-            Sort by the date each note was added.
-          </Text>
-          {(['newest', 'oldest'] as SortOrder[]).map((order) => {
-            const selected = sortOrder === order;
-            return (
-              <TouchableOpacity
-                key={order}
-                style={[
-                  styles.sortOption,
-                  {
-                    backgroundColor: selected ? colors.soft : colors.surface,
-                    borderColor: colors.border,
-                  },
-                ]}
-                onPress={() => setSortOrder(order)}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: selected }}
-              >
-                <View>
-                  <Text style={[styles.sortTitle, { color: colors.text }]}>
-                    {order === 'newest' ? 'Newest first' : 'Oldest first'}
-                  </Text>
-                  <Text style={[styles.sortSubtitle, { color: colors.muted }]}>
-                    {order === 'newest'
-                      ? 'Date added · descending'
-                      : 'Date added · ascending'}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.radio,
-                    selected && {
-                      backgroundColor: colors.primary,
-                      borderColor: colors.primary,
-                    },
-                  ]}
-                >
-                  {selected && <Text style={styles.radioCheck}>✓</Text>}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-        <BottomNavigation
-          active="notes"
-          onNotes={() => onSelectCategory('All')}
-          onAdd={onOpenAddNote}
-          onProfile={onOpenProfile}
-        />
-      </SafeAreaView>
-    );
-  }
 
   if (screenMode === 'search') {
     return (
@@ -384,12 +302,12 @@ export default function NotesListScreen({
                   {sortOrder === 'newest' ? 'Newest first' : 'Oldest first'}
                 </Text>
               </View>
-              <TouchableOpacity
-                style={[styles.sortButton, { backgroundColor: colors.soft }]}
-                onPress={() => setScreenMode('sort')}
-                accessibilityRole="button"
-                accessibilityLabel="Sort notes"
-              >
+             <TouchableOpacity
+     style={[styles.sortButton, { backgroundColor: colors.soft }]}
+    onPress={() => setSortMenuVisible(true)}
+    accessibilityRole="button"
+     accessibilityLabel="Sort notes"
+    >
                 <Text style={[styles.sortIcon, { color: colors.primary }]}>
                   ≡
                 </Text>
@@ -397,16 +315,101 @@ export default function NotesListScreen({
             </View>
           </>
         }
-        ListEmptyComponent={
-          loading ? (
-            <ActivityIndicator color={colors.primary} />
-          ) : (
-            <Text style={[styles.emptyText, { color: colors.muted }]}>
-              {emptyText}
-            </Text>
-          )
-        }
+    ListEmptyComponent={
+  loading ? (
+    <ActivityIndicator color={colors.primary} />
+  ) : searchText.trim() ? (
+    <Text style={[styles.emptyText, { color: colors.muted }]}>
+      {emptyText}
+    </Text>
+  ) : (
+    <View style={styles.emptyState}>
+     <Image
+  source={
+    lightTheme
+      ? require('../../assets/empty-notes2.png')
+      : require('../../assets/empty-notes.png')
+  }
+  style={styles.emptyImage}
+  resizeMode="contain"
+/>
+
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>
+        No notes yet
+      </Text>
+
+      <Text style={[styles.emptyDescription, { color: colors.muted }]}>
+        Your notes will appear here. Start by creating one!
+      </Text>
+    </View>
+  )
+}
       />
+      <Modal
+  visible={sortMenuVisible}
+  transparent
+  animationType="fade"
+  statusBarTranslucent
+  onRequestClose={() => setSortMenuVisible(false)}
+>
+  <View style={styles.sortModalRoot}>
+    {/* Close menu when tapping outside */}
+    <Pressable
+      style={StyleSheet.absoluteFill}
+      onPress={() => setSortMenuVisible(false)}
+    />
+
+    {/* Dropdown */}
+    <View
+      style={[
+        styles.sortDropdown,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
+      ]}
+    >
+      <Text style={[styles.sortDropdownHeading, { color: colors.muted }]}>
+        SORT BY
+      </Text>
+
+      {(['newest', 'oldest'] as SortOrder[]).map((order) => {
+        const selected = sortOrder === order;
+
+        return (
+          <TouchableOpacity
+            key={order}
+            style={styles.sortDropdownOption}
+            onPress={() => {
+              setSortOrder(order);
+              setSortMenuVisible(false);
+            }}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: selected }}
+          >
+            <Text
+              style={[
+                styles.sortDropdownText,
+                {
+                  color: selected ? colors.primary : colors.text,
+                  fontWeight: selected ? '700' : '500',
+                },
+              ]}
+            >
+              {order === 'newest' ? 'Newest first' : 'Oldest first'}
+            </Text>
+
+            {selected && (
+              <Text style={[styles.sortDropdownCheck, { color: colors.primary }]}>
+                ✓
+              </Text>
+            )}
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  </View>
+</Modal>
       <BottomNavigation
         active="notes"
         onNotes={() => onSelectCategory('All')}
@@ -623,51 +626,75 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 18,
   },
-  sortHeadline: {
-    fontFamily: Platform.select({
-      ios: 'Georgia',
-      android: 'serif',
-      default: 'serif',
-    }),
-    fontSize: 25,
-    lineHeight: 33,
-    marginBottom: 8,
+  sortModalRoot: {
+  flex: 1,
+},
+
+sortDropdown: {
+  position: 'absolute',
+  top: 300,
+  right: 24,
+  width: 190,
+  borderRadius: 16,
+  borderWidth: 1,
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  elevation: 8,
+  shadowColor: '#000000',
+  shadowOffset: {
+    width: 0,
+    height: 4,
   },
-  sortDescription: {
-    fontSize: 13,
-    marginBottom: 28,
-  },
-  sortOption: {
-    minHeight: 80,
-    borderWidth: 1,
-    borderColor: 'transparent',
-    borderRadius: 20,
-    paddingHorizontal: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  sortTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  sortSubtitle: {
-    fontSize: 12,
-  },
-  radio: {
-    width: 24,
-    height: 24,
-    borderWidth: 1,
-    borderColor: '#D9CDD2',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioCheck: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-  },
+  shadowOpacity: 0.12,
+  shadowRadius: 10,
+},
+
+sortDropdownHeading: {
+  fontSize: 10,
+  fontWeight: '700',
+  letterSpacing: 1,
+  paddingHorizontal: 8,
+  paddingVertical: 8,
+},
+
+sortDropdownOption: {
+  minHeight: 42,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: 8,
+},
+
+sortDropdownText: {
+  fontSize: 13,
+},
+
+sortDropdownCheck: {
+  fontSize: 16,
+  fontWeight: '700',
+},emptyState: {
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingHorizontal: 20,
+  paddingTop: 35,
+},
+
+emptyImage: {
+  width: 190,
+  height: 190,
+  marginBottom: 16,
+},
+
+emptyTitle: {
+  fontSize: 20,
+  fontWeight: '700',
+  marginBottom: 8,
+},
+
+emptyDescription: {
+  fontSize: 13,
+  textAlign: 'center',
+  lineHeight: 20,
+  maxWidth: 250,
+},
 });

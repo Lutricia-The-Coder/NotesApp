@@ -1,9 +1,5 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useState,
-} from 'react';
+
+import React, { createContext, ReactNode,useContext, useState,} from 'react';
 
 export interface AppColors {
   background: string;
@@ -24,11 +20,11 @@ export interface AppColors {
 
 interface ThemeContextValue {
   colors: AppColors;
-  blueTheme: boolean;
-  setBlueTheme: (enabled: boolean) => void;
+  lightTheme: boolean;
+  setLightTheme: (enabled: boolean) => void;
 }
 
-const palettes: { pink: AppColors; blue: AppColors } = {
+const palettes: { pink: AppColors; black: AppColors } = {
   pink: {
     background: '#FFF8FA',
     surface: '#FFFFFF',
@@ -45,19 +41,19 @@ const palettes: { pink: AppColors; blue: AppColors } = {
     danger: '#B43C4B',
     dangerSoft: '#FFF0F1',
   },
-  blue: {
-    background: '#F3F8FF',
+  black: {
+    background: '#F5F5F5',
     surface: '#FFFFFF',
-    text: '#26364B',
-    muted: '#718198',
-    label: '#40536D',
-    border: '#D8E4F3',
-    primary: '#3478D4',
-    soft: '#E2EDFC',
-    softText: '#2D66B1',
+    text: '#171717',
+    muted: '#737373',
+    label: '#404040',
+    border: '#E0E0E0',
+    primary: '#171717',
+    soft: '#EAEAEA',
+    softText: '#262626',
     workCard: '#FFFFFF',
-    studyCard: '#EFF3FC',
-    personalCard: '#EAF3FF',
+    studyCard: '#F0F0F0',
+    personalCard: '#E8E8E8',
     danger: '#B43C4B',
     dangerSoft: '#FFF0F1',
   },
@@ -66,14 +62,14 @@ const palettes: { pink: AppColors; blue: AppColors } = {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [blueTheme, setBlueTheme] = useState(false);
+  const [lightTheme, setLightTheme] = useState(false);
 
   return (
     <ThemeContext.Provider
       value={{
-        colors: blueTheme ? palettes.blue : palettes.pink,
-        blueTheme,
-        setBlueTheme,
+        colors: lightTheme ? palettes.black : palettes.pink,
+        lightTheme,
+        setLightTheme,
       }}
     >
       {children}

@@ -41,7 +41,7 @@ export default function ProfileScreen({
   const [saving, setSaving] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
 
-  const { colors, blueTheme, setBlueTheme } = useAppTheme();
+  const { colors, lightTheme, setLightTheme } = useAppTheme();
   const firstName = user?.username.trim().split(/\s+/)[0] || 'there';
   const inputStyle = [
     styles.input,
@@ -278,20 +278,18 @@ export default function ProfileScreen({
             >
               <View style={styles.themeCopy}>
                 <Text style={[styles.themeTitle, { color: colors.text }]}>
-                  Blue theme
+                 Theme
                 </Text>
-                <Text style={[styles.themeDescription, { color: colors.muted }]}>
-                  Switch to a calm blue palette.
-                </Text>
+               
               </View>
               <Switch
-                value={blueTheme}
-                onValueChange={setBlueTheme}
-                trackColor={{ false: '#D8CDD1', true: colors.primary }}
+                value={lightTheme}
+                onValueChange={setLightTheme}
+                trackColor={{ false: '#D8CDD1', true: '#000000' }}
                 thumbColor="#FFFFFF"
                 ios_backgroundColor="#D8CDD1"
-                accessibilityLabel="Blue theme"
-                accessibilityHint="Changes the profile colors to blue"
+                accessibilityLabel="Light theme"
+                accessibilityHint="Changes the profile colors to light"
               />
             </View>
 
