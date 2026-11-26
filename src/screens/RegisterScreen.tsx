@@ -1,19 +1,8 @@
 import React, { useState } from 'react';
-
-import {
-  Alert,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppTheme } from '../context/ThemeContext';
-
 import { BrandMark, LockMark } from '../components/NotesUi';
 import { useAuth } from '../context/AuthContext';
 import { RootStackParamList } from '../navigation/types';
@@ -38,10 +27,10 @@ export default function RegisterScreen({
       return;
     }
 
-    if (!/\S+@\S+\.\S+/.test(email.trim())) {
-      Alert.alert('Error', 'Please enter a valid email address.');
-      return;
-    }
+   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+  Alert.alert('Error', 'Please enter a valid email address.');
+  return;
+}
 
     try {
       await register(username, email, password);
@@ -113,6 +102,8 @@ export default function RegisterScreen({
           keyboardType="email-address"
           autoCapitalize="none"
           accessibilityLabel="Email address"
+          autoComplete="email"
+textContentType="emailAddress"
         />
 
         <Text style={[styles.label, { color: colors.label }]}>Password</Text>
@@ -131,6 +122,8 @@ export default function RegisterScreen({
           onChangeText={setPassword}
           secureTextEntry
           accessibilityLabel="Password"
+          autoComplete="new-password"
+textContentType="newPassword"
         />
 
         <TouchableOpacity

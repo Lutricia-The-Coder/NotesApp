@@ -1,24 +1,13 @@
 import React, { useEffect, useState } from 'react';
-
-import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Platform, ScrollView,StatusBar,  StyleSheet,Text, TouchableOpacity,View,} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { BackHeader } from '../components/NotesUi';
 import { useAuth } from '../context/AuthContext';
 import { useAppTheme } from '../context/ThemeContext';
 import { RootStackParamList } from '../navigation/types';
 import { deleteNote, getNotes, Note } from '../storage/storage';
+import { Ionicons } from '@expo/vector-icons';
 
 type NoteDetailsScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -129,7 +118,11 @@ export default function NoteDetailsScreen({
             A little space to make it yours.
           </Text>
           <View style={[styles.deleteIconTile, { backgroundColor: colors.soft }]}>
-            <Text style={[styles.trashIcon, { color: colors.primary }]}>▤</Text>
+           <Ionicons
+  name="trash-outline"
+  size={38}
+  color={colors.primary}
+/>
           </View>
           <Text style={[styles.confirmTitle, { color: colors.text }]}>
             Let this thought go?
@@ -186,14 +179,17 @@ export default function NoteDetailsScreen({
           A little space to make it yours.
         </Text>
 
-        <View style={[styles.categoryChip, { backgroundColor: colors.soft }]}>
-          <Text style={[styles.categoryIcon, { color: colors.primary }]}>
-            {getCategoryIcon(note.category)}
-          </Text>
-          <Text style={[styles.categoryText, { color: colors.softText }]}>
-            {note.category}
-          </Text>
-        </View>
+       <View style={[styles.categoryChip, { backgroundColor: colors.soft }]}>
+  <Ionicons
+    name={getCategoryIcon(note.category)}
+    size={16}
+    color={colors.primary}
+    style={styles.categoryIcon}
+  />
+  <Text style={[styles.categoryText, { color: colors.softText }]}>
+    {note.category}
+  </Text>
+</View>
 
         <Text style={[styles.title, { color: colors.text }]}>
           {note.title || 'Untitled Note'}
@@ -244,17 +240,18 @@ export default function NoteDetailsScreen({
   );
 }
 
-function getCategoryIcon(category: Note['category']) {
+function getCategoryIcon(
+  category: Note['category']
+): keyof typeof Ionicons.glyphMap {
   switch (category) {
     case 'Work':
-      return '▣';
+      return 'briefcase-outline';
     case 'Study':
-      return '◫';
+      return 'book-outline';
     case 'Personal':
-      return '♡';
+      return 'person-outline';
   }
 }
-
 function formatDate(value: string) {
   return new Date(value).toLocaleString(undefined, {
     month: 'short',
@@ -309,10 +306,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 22,
   },
-  categoryIcon: {
-    fontSize: 15,
-    marginRight: 7,
-  },
+categoryIcon: {
+  marginRight: 7,
+},
   categoryText: {
     fontSize: 11,
     fontWeight: '700',
@@ -379,10 +375,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 24,
     marginBottom: 26,
-  },
-  trashIcon: {
-    fontSize: 36,
-    lineHeight: 42,
   },
   confirmTitle: {
     fontFamily: Platform.select({

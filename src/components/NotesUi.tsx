@@ -84,7 +84,11 @@ export function BottomNavigation({
           accessibilityRole="button"
           accessibilityLabel="Notes"
         >
-          <NoteIcon color={colors.muted} />
+          <Ionicons
+  name="document-text-outline"
+  size={22}
+  color={colors.muted}
+/>
           <Text style={[styles.navLabel, { color: colors.muted }]}>
             Notes
           </Text>
@@ -120,7 +124,11 @@ export function BottomNavigation({
           accessibilityRole="button"
           accessibilityLabel="Profile"
         >
-          <Ionicons name="person-circle-outline" size={23} color={colors.primary} />
+       <Ionicons
+  name="person-circle-outline"
+  size={23}
+  color={colors.muted}
+/>
           <Text style={[styles.navLabel, { color: colors.muted }]}>
             Profile
           </Text>
@@ -135,25 +143,6 @@ export function LockMark({ color }: { color: string }) {
     <View style={styles.lockIcon} accessible={false}>
       <View style={[styles.lockShackle, { borderColor: color }]} />
       <View style={[styles.lockBody, { borderColor: color }]} />
-    </View>
-  );
-}
-
-function NoteIcon({ color }: { color: string }) {
-  return (
-    <View style={[styles.noteIcon, { borderColor: color }]} accessible={false}>
-      <View style={[styles.noteIconLine, { backgroundColor: color }]} />
-      <View style={[styles.noteIconLine, { backgroundColor: color }]} />
-      <View style={[styles.noteIconLine, { backgroundColor: color }]} />
-    </View>
-  );
-}
-
-function ProfileIcon({ color }: { color: string }) {
-  return (
-    <View style={styles.profileIcon} accessible={false}>
-      <View style={[styles.profileHead, { borderColor: color }]} />
-      <View style={[styles.profileShoulders, { borderColor: color }]} />
     </View>
   );
 }
@@ -177,11 +166,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 14,
   },
-  backArrow: {
-    fontSize: 30,
-    lineHeight: 34,
-    marginTop: -3,
-  },
+
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
@@ -211,43 +196,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
   },
-  noteIcon: {
-    width: 15,
-    height: 18,
-    borderWidth: 1.5,
-    borderRadius: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 3,
-    marginBottom: 3,
-  },
-  noteIconLine: {
-    width: 7,
-    height: 1,
-    marginVertical: 1,
-  },
-  profileIcon: {
-    width: 22,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginBottom: 3,
-  },
-  profileHead: {
-    width: 8,
-    height: 8,
-    borderWidth: 1.5,
-    borderRadius: 4,
-    marginBottom: 1,
-  },
-  profileShoulders: {
-    width: 16,
-    height: 8,
-    borderWidth: 1.5,
-    borderBottomWidth: 0,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
+  
   addButton: {
     width: 58,
     height: 58,
@@ -255,12 +204,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addButtonText: {
-    color: '#FFFFFF',
-    fontSize: 32,
-    lineHeight: 36,
-    marginTop: -2,
-  },
+
   lockIcon: {
     width: 30,
     height: 32,

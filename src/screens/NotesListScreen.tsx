@@ -39,6 +39,7 @@ export default function NotesListScreen({
       let isCurrent = true;
 
       const loadNotes = async () => {
+        setLoading(true);
         if (!user) {
           setNotes([]);
           setLoading(false);
@@ -180,17 +181,20 @@ export default function NotesListScreen({
                   autoFocus
                   accessibilityLabel="Search notes"
                 />
-                {searchText.length > 0 && (
-                  <TouchableOpacity
-                    onPress={() => setSearchText('')}
-                    accessibilityRole="button"
-                    accessibilityLabel="Clear search"
-                  >
-                    <Text style={[styles.clearSearch, { color: colors.muted }]}>
-                     <Ionicons name="close-circle" size={21} color={colors.muted} />
-                    </Text>
-                  </TouchableOpacity>
-                )}
+        {searchText.length > 0 && (
+  <TouchableOpacity
+    onPress={() => setSearchText('')}
+    accessibilityRole="button"
+    accessibilityLabel="Clear search"
+  >
+    <Ionicons
+      name="close-circle"
+      size={21}
+      color={colors.muted}
+    />
+  </TouchableOpacity>
+)}
+                
               </View>
               <Text style={[styles.resultCount, { color: colors.text }]}>
                 {sortedNotes.length}{' '}
@@ -505,10 +509,6 @@ screenTitle: {
     flex: 1,
     fontSize: 15,
     paddingVertical: 11,
-  },
-  clearSearch: {
-    fontSize: 23,
-    paddingHorizontal: 4,
   },
   categoryRow: {
     flexDirection: 'row',

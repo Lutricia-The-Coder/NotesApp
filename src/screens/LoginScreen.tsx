@@ -1,19 +1,8 @@
 import React, { useState } from 'react';
-
-import {
-  Alert,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert,  ScrollView,StatusBar,StyleSheet,Text, TextInput, TouchableOpacity,View,} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppTheme } from '../context/ThemeContext';
-
 import { BrandMark, LockMark } from '../components/NotesUi';
 import { useAuth } from '../context/AuthContext';
 import { RootStackParamList } from '../navigation/types';
@@ -86,6 +75,8 @@ export default function LoginScreen({
           keyboardType="email-address"
           autoCapitalize="none"
           accessibilityLabel="Email address"
+          autoComplete="email"
+textContentType="emailAddress"
         />
 
         <Text style={[styles.label, { color: colors.label }]}>Password</Text>
@@ -104,6 +95,8 @@ export default function LoginScreen({
           onChangeText={setPassword}
           secureTextEntry
           accessibilityLabel="Password"
+          autoComplete="current-password"
+          textContentType="password"
         />
 
         <TouchableOpacity

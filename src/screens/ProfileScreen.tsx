@@ -1,28 +1,12 @@
 import React, { useState } from 'react';
-
-import {
-  Alert,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert,Platform,  ScrollView,StatusBar,StyleSheet, Switch,  Text,  TextInput,TouchableOpacity,View,} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { useAuth } from '../context/AuthContext';
 import { useAppTheme } from '../context/ThemeContext';
 import { RootStackParamList } from '../navigation/types';
-import {
-  BackHeader,
-  BottomNavigation,
-  LockMark,
-} from '../components/NotesUi';
+import {BackHeader,BottomNavigation, LockMark,} from '../components/NotesUi';
+import { Ionicons } from '@expo/vector-icons';
 
 type ProfileScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -40,9 +24,7 @@ export default function ProfileScreen({
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
-
   const { colors, lightTheme, setLightTheme } = useAppTheme();
-  const firstName = user?.username.trim().split(/\s+/)[0] || 'there';
   const inputStyle = [
     styles.input,
     {
@@ -146,15 +128,18 @@ export default function ProfileScreen({
           <Text style={[styles.fieldLabel, { color: colors.label }]}>
             Username
           </Text>
-          <TextInput
-            style={inputStyle}
-            placeholder="Enter your username"
-            placeholderTextColor={colors.muted}
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="words"
-            accessibilityLabel="Username"
-          />
+        <TextInput
+  style={inputStyle}
+  placeholder="Enter your email"
+  placeholderTextColor={colors.muted}
+  value={email}
+  onChangeText={setEmail}
+  keyboardType="email-address"
+  autoCapitalize="none"
+  autoComplete="email"
+  textContentType="emailAddress"
+  accessibilityLabel="Email address"
+/>
 
           <Text style={[styles.fieldLabel, { color: colors.label }]}>
             Email address
@@ -167,7 +152,8 @@ export default function ProfileScreen({
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            accessibilityLabel="Email address"
+            accessibilityLabel="Email address"autoComplete="email"
+textContentType="emailAddress"
           />
 
           <Text style={[styles.fieldLabel, { color: colors.label }]}>
@@ -181,6 +167,8 @@ export default function ProfileScreen({
             onChangeText={setNewPassword}
             secureTextEntry
             accessibilityLabel="New password"
+            autoComplete="new-password"
+textContentType="newPassword"
           />
           <Text style={[styles.helperText, { color: colors.muted }]}>
             At least 6 characters. Leave blank to keep it.
@@ -197,6 +185,8 @@ export default function ProfileScreen({
             onChangeText={setCurrentPassword}
             secureTextEntry
             accessibilityLabel="Current password"
+            autoComplete="current-password"
+textContentType="password"
           />
           <Text style={[styles.helperText, styles.currentPasswordHelper, { color: colors.muted }]}>
             Confirm it&apos;s you to save these changes.
@@ -261,12 +251,12 @@ export default function ProfileScreen({
                 >
                   Edit account details
                 </Text>
-                <Text
-                  style={[styles.forwardArrow, { color: colors.softText }]}
-                  accessible={false}
-                >
-                  ›
-                </Text>
+               <Ionicons
+  name="chevron-forward"
+  size={20}
+  color={colors.softText}
+  accessible={false}
+/>
               </TouchableOpacity>
             </View>
 
@@ -357,24 +347,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 36,
   },
-  greetingCaption: {
-    fontSize: 14,
-    marginBottom: 28,
-  },
-  greeting: {
-    fontFamily: Platform.select({
-      ios: 'Georgia',
-      android: 'serif',
-      default: 'serif',
-    }),
-    fontSize: 33,
-    lineHeight: 42,
-    marginBottom: 8,
-  },
-  greetingDescription: {
-    fontSize: 14,
-    marginBottom: 28,
-  },
   accountCard: {
     borderWidth: 1,
     borderRadius: 24,
@@ -435,10 +407,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 3,
   },
-  themeDescription: {
-    fontSize: 12,
-    lineHeight: 17,
-  },
+
   privacyCard: {
     minHeight: 112,
     borderRadius: 22,
