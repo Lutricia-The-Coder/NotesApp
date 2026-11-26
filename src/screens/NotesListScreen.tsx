@@ -6,7 +6,7 @@ import { BottomNavigation, BrandMark, BackHeader } from '../components/NotesUi';
 import { useAuth } from '../context/AuthContext';
 import { useAppTheme } from '../context/ThemeContext';
 import { Note, getUserNotes } from '../storage/storage';
-
+import { Ionicons } from '@expo/vector-icons';
 export type NoteCategory = 'All' | 'Work' | 'Study' | 'Personal';
 type SortOrder = 'newest' | 'oldest';
 type ScreenMode = 'list' | 'search';
@@ -109,9 +109,12 @@ export default function NotesListScreen({
     >
       <View style={styles.noteMeta}>
         <View style={styles.noteCategory}>
-          <Text style={[styles.noteCategoryIcon, { color: colors.primary }]}>
-            {getCategoryIcon(item.category)}
-          </Text>
+          <Ionicons
+  name={getCategoryIcon(item.category)}
+  size={16}
+  color={colors.primary}
+  style={{ marginRight: 7 }}
+/>
           <Text style={[styles.noteCategoryText, { color: colors.softText }]}>
             {item.category.toUpperCase()}
           </Text>
@@ -166,9 +169,7 @@ export default function NotesListScreen({
                   },
                 ]}
               >
-                <Text style={[styles.searchIcon, { color: colors.primary }]}>
-                  ⌕
-                </Text>
+               <Ionicons name="search-outline" size={20} color={colors.primary} />
                 <TextInput
                   style={[styles.searchField, { color: colors.text }]}
                   placeholder="Search your thoughts..."
@@ -186,7 +187,7 @@ export default function NotesListScreen({
                     accessibilityLabel="Clear search"
                   >
                     <Text style={[styles.clearSearch, { color: colors.muted }]}>
-                      ×
+                     <Ionicons name="close-circle" size={21} color={colors.muted} />
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -250,9 +251,7 @@ export default function NotesListScreen({
               accessibilityRole="button"
               accessibilityLabel="Search your thoughts"
             >
-              <Text style={[styles.searchIcon, { color: colors.muted }]}>
-                ⌕
-              </Text>
+              <Ionicons name="search-outline" size={20} color={colors.muted} />
               <Text style={[styles.searchPlaceholder, { color: colors.muted }]}>
                 Search your thoughts...
               </Text>
@@ -308,9 +307,7 @@ export default function NotesListScreen({
     accessibilityRole="button"
      accessibilityLabel="Sort notes"
     >
-                <Text style={[styles.sortIcon, { color: colors.primary }]}>
-                  ≡
-                </Text>
+                <Ionicons name="options-outline" size={23} color={colors.primary} />
               </TouchableOpacity>
             </View>
           </>
@@ -400,9 +397,7 @@ export default function NotesListScreen({
             </Text>
 
             {selected && (
-              <Text style={[styles.sortDropdownCheck, { color: colors.primary }]}>
-                ✓
-              </Text>
+             <Ionicons name="checkmark" size={18} color={colors.primary} />
             )}
           </TouchableOpacity>
         );
@@ -434,17 +429,18 @@ function getCategoryColor(
   }
 }
 
-function getCategoryIcon(category: Note['category']) {
+function getCategoryIcon(
+  category: Note['category']
+): keyof typeof Ionicons.glyphMap {
   switch (category) {
     case 'Work':
-      return '▣';
+      return 'briefcase-outline';
     case 'Study':
-      return '◫';
+      return 'book-outline';
     case 'Personal':
-      return '♡';
+      return 'person-outline';
   }
 }
-
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString(undefined, {
     month: 'short',
@@ -476,15 +472,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  screenTitle: {
-    fontFamily: Platform.select({
-      ios: 'Georgia',
-      android: 'serif',
-      default: 'serif',
-    }),
-    fontSize: 32,
-    lineHeight: 40,
-  },
+screenTitle: {
+  fontFamily: Platform.select({
+    ios: 'Georgia',
+    android: 'serif',
+    default: 'serif',
+  }),
+  fontSize: 32,
+  lineHeight: 40,
+  textAlign: 'center',
+  width: '100%',
+},
   screenDescription: {
     fontSize: 14,
     marginTop: 2,
@@ -499,11 +497,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 16,
   },
-  searchIcon: {
-    fontSize: 24,
-    lineHeight: 28,
-    marginRight: 10,
-  },
+ 
   searchPlaceholder: {
     fontSize: 14,
   },
@@ -533,6 +527,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  noteCategory: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -557,11 +555,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 12,
   },
-  sortIcon: {
-    fontSize: 26,
-    lineHeight: 30,
-    marginTop: -3,
-  },
   noteCard: {
     borderRadius: 20,
     borderWidth: 1,
@@ -574,14 +567,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 12,
-  },
-  noteCategory: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  noteCategoryIcon: {
-    fontSize: 15,
-    marginRight: 7,
   },
   noteCategoryText: {
     fontSize: 10,
@@ -667,12 +652,9 @@ sortDropdownOption: {
 
 sortDropdownText: {
   fontSize: 13,
-},
+}
 
-sortDropdownCheck: {
-  fontSize: 16,
-  fontWeight: '700',
-},emptyState: {
+,emptyState: {
   alignItems: 'center',
   justifyContent: 'center',
   paddingHorizontal: 20,

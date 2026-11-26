@@ -124,20 +124,21 @@ export default function NoteEditor({
           accessibilityLabel="Note content"
         />
 
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            { backgroundColor: colors.primary },
-            saving && styles.disabledButton,
-          ]}
-          onPress={onSave}
-          disabled={saving}
-          accessibilityRole="button"
-        >
-          <Text style={styles.saveButtonText}>
-            {saving ? 'Saving...' : saveLabel}
-          </Text>
-        </TouchableOpacity>
+       <TouchableOpacity
+  style={[
+    styles.saveButton,
+    { backgroundColor: colors.primary },
+    saving && styles.disabledButton,
+  ]}
+  onPress={onSave}
+  disabled={saving}
+  accessibilityRole="button"
+  accessibilityLabel={saving ? 'Saving note' : saveLabel}
+>
+  <Text style={styles.saveButtonText}>
+    {saving ? 'Saving...' : saveLabel}
+  </Text>
+</TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

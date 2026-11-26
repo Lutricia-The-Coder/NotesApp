@@ -1,11 +1,6 @@
 import React from 'react';
-
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text,TouchableOpacity, View,} from 'react-native';
 
 import { useAppTheme } from '../context/ThemeContext';
 
@@ -14,7 +9,7 @@ export function BrandMark() {
 
   return (
     <Text style={[styles.brandMark, { color: colors.primary }]}>
-      petal ✿
+      petal 
     </Text>
   );
 }
@@ -36,7 +31,11 @@ export function BackHeader({
         accessibilityRole="button"
         accessibilityLabel="Go back"
       >
-        <Text style={[styles.backArrow, { color: colors.primary }]}>‹</Text>
+       <Ionicons
+  name="chevron-back"
+  size={24}
+  color={colors.primary}
+/>
       </TouchableOpacity>
       <Text style={[styles.headerTitle, { color: colors.text }]}>
         {title}
@@ -73,7 +72,7 @@ export function BottomNavigation({
           accessibilityState={{ selected: true }}
           accessibilityLabel="Notes"
         >
-          <NoteIcon color={colors.primary} />
+       <Ionicons name="document-text-outline" size={22} color={colors.primary} />
           <Text style={[styles.navLabel, { color: colors.softText }]}>
             Notes
           </Text>
@@ -98,7 +97,7 @@ export function BottomNavigation({
         accessibilityRole="button"
         accessibilityLabel="Add a note"
       >
-        <Text style={styles.addButtonText}>+</Text>
+       <Ionicons name="add" size={32} color="#FFFFFF" />
       </TouchableOpacity>
 
       {active === 'profile' ? (
@@ -109,7 +108,7 @@ export function BottomNavigation({
           accessibilityState={{ selected: true }}
           accessibilityLabel="Profile"
         >
-          <ProfileIcon color={colors.primary} />
+        <Ionicons name="person-circle-outline" size={23} color={colors.primary} /> 
           <Text style={[styles.navLabel, { color: colors.softText }]}>
             Profile
           </Text>
@@ -121,7 +120,7 @@ export function BottomNavigation({
           accessibilityRole="button"
           accessibilityLabel="Profile"
         >
-          <ProfileIcon color={colors.muted} />
+          <Ionicons name="person-circle-outline" size={23} color={colors.primary} />
           <Text style={[styles.navLabel, { color: colors.muted }]}>
             Profile
           </Text>
