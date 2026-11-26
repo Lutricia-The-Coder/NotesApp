@@ -1,23 +1,7 @@
 
-import React, {
-  createContext,
-  useState,
-  ReactNode,
-  useContext,
-  useEffect,
-} from 'react';
-
+import React, {createContext, useState,ReactNode, useContext,  useEffect,} from 'react';
 import { hash, compare } from 'bcryptjs';
-
-import {
-  User,
-  LoggedInUser,
-  getUsers,
-  saveUsers,
-  saveSession,
-  getSession,
-  clearSession,
-} from '../storage/storage';
+import {User, LoggedInUser, getUsers, saveUsers,  saveSession,getSession, clearSession} from '../storage/storage';
 
 interface AuthContextType {
   user: LoggedInUser | null;
@@ -28,6 +12,10 @@ interface AuthContextType {
     password: string
   ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  resetPassword: (
+  email: string,
+  newPassword: string
+) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (
     username: string,
@@ -140,6 +128,38 @@ export default function AuthProvider({
   };
 
   // Update the current user's profile
+  
+// Reset a user's password
+const resetPassword = async (
+  email: string,
+  newPassword: string
+) => {
+  const users = await getUsers();
+  const cleanEmail = email.trim().toLowerCase();
+
+  const existingUser = users.find(
+    (item) => item.email === cleanEmail
+  );
+
+  if (!existingUser) {
+    throw new Error('No account found with this email address.');
+  }
+
+  if (newPassword.trim().length < 6) {
+    throw new Error('Password must be at least 6 characters long.');
+  }
+
+  const passwordHash = await hash(newPassword, 10);
+
+  const updatedUsers = users.map((item) =>
+    item.id === existingUser.id
+      ? { ...item, passwordHash }
+      : item
+  );
+
+  await saveUsers(updatedUsers);
+};
+  // Update the current user's profile
   const updateProfile = async (
     username: string,
     email: string,
@@ -228,6 +248,7 @@ export default function AuthProvider({
         login,
         logout,
         updateProfile,
+        resetPassword,
       }}
     >
       {children}

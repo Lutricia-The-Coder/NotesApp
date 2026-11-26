@@ -98,7 +98,15 @@ textContentType="emailAddress"
           autoComplete="current-password"
           textContentType="password"
         />
-
+<TouchableOpacity
+  style={styles.forgotPasswordButton}
+  onPress={() => navigation.navigate('ForgotPassword')}
+  accessibilityRole="button"
+>
+  <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>
+    Forgot Password?
+  </Text>
+</TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, { backgroundColor: colors.primary }]}
           onPress={handleLogin}
@@ -189,4 +197,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
+  forgotPasswordButton: {
+  alignSelf: 'flex-end',
+  marginTop: -14,
+  marginBottom: 20,
+},
+
+forgotPasswordText: {
+  fontSize: 13,
+  fontWeight: '600',
+},
 });

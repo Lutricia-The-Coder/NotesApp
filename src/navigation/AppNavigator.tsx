@@ -1,6 +1,6 @@
 
 import React from 'react';
-
+import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, ActivityIndicator } from 'react-native';
@@ -99,7 +99,11 @@ if (loading) {
               component={LoginScreen}
               options={{ headerShown: false }}
             />
-
+            <Stack.Screen
+  name="ForgotPassword"
+  component={ForgotPasswordScreen}
+  options={{ headerShown: false }}
+/>
             <Stack.Screen
               name="Register"
               component={RegisterScreen}
