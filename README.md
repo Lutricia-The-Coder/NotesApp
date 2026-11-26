@@ -60,6 +60,17 @@ Users can sort notes according to their date added:
 
 Sorting is available on the Home, Work, Study and Personal notes screens.
 
+
+## Application Preview
+
+![Login Screen](assets/login.jpeg)
+
+![Home Screen](assets/notes.jpeg)
+
+![Profile Screen](assets/theme.jpeg)
+
+![Add Screen](assets/addnotes.jpeg)
+
 ## 3. Technologies Used
 
 | Technology | Purpose |
